@@ -139,7 +139,10 @@ module.machine = {
     OPEN = {
       hooks = {
         on_enter = function(self)
-          self.ctx.picker:render(not self.ctx.options.show_current and hide_current() or nil)
+          local picker = self.ctx.picker
+
+          picker:set_ctx({ state = self.current })
+          picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
           self.ctx.state = {
             input = vim.fn.getcharstr(),
@@ -190,30 +193,35 @@ module.machine = {
           if self.ctx.options.handle == 'bufnr' then
             local matches = read_many(picker.entries)
 
-            if matches then
-              local count = 0
-              local unsaved
+            if not matches then
+              return self:transition('OPEN')
+            end
 
-              picker:close()
+            picker:close()
 
-              for _, match in pairs(matches) do
-                local status = pcall(vim.api.nvim_command, match.data.delete_command)
+            local count = 0
+            local unsaved
 
-                if status then
-                  count = count + 1
-                elseif not unsaved then
-                  unsaved = match.data
-                end
+            for _, match in pairs(matches) do
+              local status = pcall(vim.api.nvim_command, match.data.delete_command)
+
+              if status then
+                count = count + 1
+                picker:remove('bufnr', match.data.bufnr)
+              elseif not unsaved then
+                unsaved = match.data
               end
+            end
 
-              vim.api.nvim_command('redraw')
+            vim.api.nvim_command('redraw')
 
-              notify(string.format('%s buffer%s deleted', count, count > 1 and 's' or ''), vim.log.levels.INFO)
+            notify(string.format('%s buffer%s deleted', count, count > 1 and 's' or ''), vim.log.levels.INFO)
 
-              if unsaved then
-                notify('Save your changes first\n', vim.log.levels.ERROR, true)
-                switch_buf(unsaved)
-              end
+            if unsaved then
+              notify('Save your changes first\n', vim.log.levels.ERROR, true)
+              switch_buf(unsaved)
+            else
+              return self:transition('OPEN')
             end
           else
             local match
