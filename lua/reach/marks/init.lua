@@ -78,7 +78,10 @@ module.machine = {
     OPEN = {
       hooks = {
         on_enter = function(self)
-          self.ctx.picker:render()
+          local picker = self.ctx.picker
+
+          picker:set_ctx({ state = self.current })
+          picker:render()
 
           self.ctx.state = {
             input = vim.fn.getcharstr(),
@@ -117,7 +120,13 @@ module.machine = {
           local match
 
           repeat
-            match = read(picker.entries)
+            local input = vim.fn.getcharstr()
+
+            if input == ' ' then
+              return self:transition('OPEN')
+            end
+
+            match = read(picker.entries, input)
 
             if match then
               vim.api.nvim_command('delmarks ' .. match.data.mark)
@@ -136,7 +145,7 @@ module.machine = {
           self:transition('CLOSED')
         end,
       },
-      targets = { 'CLOSED' },
+      targets = { 'CLOSED', 'OPEN' },
     },
     SPLITTING = {
       hooks = {

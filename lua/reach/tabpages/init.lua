@@ -123,6 +123,7 @@ module.machine = {
             picker:before(set_icon_count)
           end
 
+          picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
           self.ctx.state = {
@@ -167,7 +168,13 @@ module.machine = {
           local match
 
           repeat
-            match = read(picker.entries)
+            local input = vim.fn.getcharstr()
+
+            if input == ' ' then
+              return self:transition('OPEN')
+            end
+
+            match = read(picker.entries, input)
 
             if match then
               vim.api.nvim_command(f('tabclose %s', match.data:number()))
@@ -186,7 +193,7 @@ module.machine = {
           self:transition('CLOSED')
         end,
       },
-      targets = { 'CLOSED' },
+      targets = { 'CLOSED', 'OPEN' },
     },
   },
 }

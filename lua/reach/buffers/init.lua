@@ -227,7 +227,13 @@ module.machine = {
             local match
 
             repeat
-              match = read_one(picker.entries, {})
+              local input = vim.fn.getcharstr()
+
+              if input == ' ' and #picker.entries > 1 then
+                return self:transition('OPEN')
+              end
+
+              match = read_one(picker.entries, { input = input })
 
               if match then
                 if match.data.bufnr == vim.api.nvim_get_current_buf() then
@@ -256,7 +262,7 @@ module.machine = {
           self:transition('CLOSED')
         end,
       },
-      targets = { 'CLOSED' },
+      targets = { 'CLOSED', 'OPEN' },
     },
     SPLITTING = {
       hooks = {
