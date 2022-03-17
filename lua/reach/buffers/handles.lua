@@ -20,7 +20,7 @@ function module.assign_auto_handles(buffers, options)
       index = index + 1
     end
 
-    buffer.handle = auto_handles[index]
+    buffer.handle = auto_handles[index] or auto_handles[#auto_handles]
 
     index = index + 1
   end
@@ -105,6 +105,8 @@ function module.assign_dynamic_handles(buffers, options)
   end)
 
   local function gen_handle(primary, src)
+    src = src .. 'abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ1234567890!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
     for _, char in pairs(vim.split(src, '')) do
       local handle = (primary or '') .. char
 
@@ -121,10 +123,7 @@ function module.assign_dynamic_handles(buffers, options)
       end
     end
 
-    return gen_handle(
-      primary,
-      'abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ1234567890!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    )
+    return primary .. src:sub(#src)
   end
 
   for _, item in pairs(details) do
