@@ -5,6 +5,7 @@ local cache = require('reach.cache')
 local config = require('reach.config')
 local helpers = require('reach.helpers')
 local highlights = require('reach.highlights')
+local util = require('reach.util')
 
 local notify = helpers.notify
 
@@ -29,7 +30,16 @@ function module.buffers(options)
 
   local bufs = make_buffers(options)
 
-  if not options.show_current and #bufs < 2 then
+  local count = #bufs
+
+  if not options.show_current then
+    local current = vim.api.nvim_get_current_buf()
+    count = util.count(function(buffer)
+      return buffer.bufnr ~= current
+    end, bufs)
+  end
+
+  if count < 1 then
     return notify('Only one buffer')
   end
 
