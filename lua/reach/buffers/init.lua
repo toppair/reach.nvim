@@ -145,7 +145,7 @@ module.machine = {
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
           self.ctx.state = {
-            input = vim.fn.getcharstr(),
+            input = vim.fn.getcharstr():sub(-1),
           }
 
           self:transition(target_state(self.ctx.state.input))

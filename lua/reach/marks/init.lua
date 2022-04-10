@@ -84,7 +84,7 @@ module.machine = {
           picker:render()
 
           self.ctx.state = {
-            input = vim.fn.getcharstr(),
+            input = vim.fn.getcharstr():sub(-1),
           }
 
           self:transition(target_state(self.ctx.state.input))
