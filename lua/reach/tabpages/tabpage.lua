@@ -16,7 +16,7 @@ end
 
 function Tabpage:handle()
   local number = self:number()
-  return tostring(number > 9 and vim.fn.nr2char(number + 87) or number)
+  return number > 9 and vim.fn.nr2char(number + 87) or tostring(number)
 end
 
 return Tabpage
