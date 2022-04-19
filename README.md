@@ -1,6 +1,6 @@
 # reach.nvim
 
-buffer / mark / tabpage switcher for [Neovim](https://github.com/neovim/neovim).
+buffer / mark / tabpage / colorscheme switcher for [Neovim](https://github.com/neovim/neovim).
 
 ![buffers](media/reach.gif)
 
@@ -121,6 +121,35 @@ ReachOpen tabpages
 When window is open:
 - type in the tabpage number to switch to that tabpage
 - press `<Space>` to start deleting tabpages
+
+#### colorschemes
+
+```lua
+-- default
+local options = {
+  filter = (function()
+    local default = {
+      'blue', 'darkblue', 'default', 'delek', 'desert', 'elflord', 'evening', 'industry', 'koehler',
+      'morning', 'murphy', 'pablo', 'peachpuff', 'ron', 'shine', 'slate', 'torte', 'zellner',
+    }
+
+    return function(name)
+      return not vim.tbl_contains(default, name) -- return true to disable
+    end
+  end)(),
+}
+
+require('reach').colorschemes(options)
+```
+
+or command with default options applied:
+
+```
+ReachOpen colorschemes
+```
+
+When window is open:
+- type in the colorscheme handle to set it
 
 ### Highlights
 

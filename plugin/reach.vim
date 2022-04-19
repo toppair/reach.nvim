@@ -1,7 +1,7 @@
 if exists('g:loaded_reach') | finish | endif
 
 function! s:complete(...)
-  return "buffers\nmarks\ntabpages"
+  return "buffers\nmarks\ntabpages\ncolorschemes"
 endfunction
 
 command! -nargs=1 -complete=custom,s:complete ReachOpen lua require'reach'.<args>()

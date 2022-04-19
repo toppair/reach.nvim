@@ -12,10 +12,12 @@ local notify = helpers.notify
 local buffers = require('reach.buffers')
 local marks = require('reach.marks')
 local tabpages = require('reach.tabpages')
+local colorschemes = require('reach.colorschemes')
 
 local make_buffers = require('reach.buffers.make_buffers')
 local make_marks = require('reach.marks.make_marks')
 local make_tabpages = require('reach.tabpages.make_tabpages')
+local make_colorschemes = require('reach.colorschemes.make_colorschemes')
 
 local module = {}
 
@@ -126,6 +128,26 @@ function module.tabpages(options)
       data = tabpage,
     })
   end, tabs)
+
+  machine.ctx = {
+    picker = Picker:new(entries),
+    options = options,
+  }
+
+  machine:init()
+end
+
+function module.colorschemes(options)
+  options = colorschemes.options.extend(options)
+
+  local machine = Machine:new(colorschemes.machine)
+
+  local entries = vim.tbl_map(function(colorscheme)
+    return Entry:new({
+      component = colorschemes.component,
+      data = colorscheme,
+    })
+  end, make_colorschemes(options))
 
   machine.ctx = {
     picker = Picker:new(entries),
