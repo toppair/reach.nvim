@@ -30,6 +30,7 @@ require('reach').setup({
 local options = {
   handle = 'auto'               -- 'bufnr' or 'dynamic' or 'auto'
   show_icons = true,
+  show_current = false,         -- Include current buffer in the list
   show_modified = true,         -- Show buffer modified indicator
   force_delete = {},            -- List of filetypes / buftypes to use
                                 -- 'bdelete!' on, e.g. { 'terminal' }
