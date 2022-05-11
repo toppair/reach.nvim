@@ -31,6 +31,7 @@ local state_to_handle_hl = setmetatable({
 function module.component(state)
   local buffer = state.data
   local ctx = state.ctx
+  local is_current = buffer.bufnr == vim.api.nvim_get_current_buf()
 
   local parts = {}
 
@@ -48,14 +49,14 @@ function module.component(state)
     insert(parts, { f('%s ', buffer.priority or ' '), 'ReachPriority' })
   end
 
-  if ctx.show_icons and buffer.icon then
+  if ctx.options.show_icons and buffer.icon then
     insert(parts, { f('%s ', buffer.icon[1]), buffer.icon[2] })
   end
 
   insert(parts, { f('%s ', buffer.tail), state.exact and 'ReachMatchExact' or 'ReachTail' })
 
-  if ctx.show_modified and buffer.modified then
-    insert(parts, { '⬤ ', 'ReachModifiedIndicator' })
+  if ctx.options.show_modified and buffer.modified then
+    insert(parts, { f('%s ', ctx.options.modified_icon), 'ReachModifiedIndicator' })
   end
 
   if buffer.deduped > 0 then
@@ -65,7 +66,7 @@ function module.component(state)
     insert(parts, { f(' · /%s ', dir), 'ReachDirectory' })
   end
 
-  if state.grayout then
+  if state.grayout or (is_current and ctx.options.grayout_current and ctx.state == 'OPEN') then
     for _, part in pairs(parts) do
       part[2] = 'ReachGrayOut'
     end

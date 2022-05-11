@@ -68,8 +68,7 @@ function module.buffers(options)
   end
 
   picker:set_ctx({
-    show_icons = options.show_icons,
-    show_modified = options.show_modified,
+    options = options,
     marker_present = marker_present,
     max_handle_length = max_handle_length,
   })
