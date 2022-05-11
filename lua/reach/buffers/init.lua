@@ -53,7 +53,15 @@ function module.component(state)
     insert(parts, { f('%s ', buffer.icon[1]), buffer.icon[2] })
   end
 
-  insert(parts, { f('%s ', buffer.tail), state.exact and 'ReachMatchExact' or 'ReachTail' })
+  local tail_hl = 'ReachTail'
+
+  if state.exact then
+    tail_hl = 'ReachMatchExact'
+  elseif is_current then
+    tail_hl = 'ReachCurrent'
+  end
+
+  insert(parts, { f('%s ', buffer.tail), tail_hl })
 
   if ctx.options.show_modified and buffer.modified then
     insert(parts, { f('%s ', ctx.options.modified_icon), 'ReachModifiedIndicator' })

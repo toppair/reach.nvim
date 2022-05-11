@@ -172,4 +172,5 @@ ReachHandleTabpage      -> 'TabLineSel',
 ReachGrayOut            -> 'Comment',
 ReachMatchExact         -> 'String',
 ReachPriority           -> 'Special',
+ReachCurrent            -> 'Title'
 ```

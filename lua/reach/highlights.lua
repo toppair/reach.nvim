@@ -16,6 +16,7 @@ local group_to_fg_group = {
   ReachGrayOut = 'Comment',
   ReachMatchExact = 'String',
   ReachPriority = 'Special',
+  ReachCurrent = 'Title',
 }
 
 local highlights = {}
