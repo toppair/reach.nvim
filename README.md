@@ -154,6 +154,13 @@ ReachOpen colorschemes
 When window is open:
 - type in the colorscheme handle to set it
 
+#### Instant switching to nth buffer
+
+```lua
+-- options as in require('reach').buffers(options)
+require('reach').switch_to_buffer(n, options)
+```
+
 ### Highlights
 
 ```

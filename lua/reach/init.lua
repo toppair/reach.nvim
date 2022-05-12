@@ -6,6 +6,7 @@ local config = require('reach.config')
 local helpers = require('reach.helpers')
 local highlights = require('reach.highlights')
 local util = require('reach.util')
+local buffer_util = require('reach.buffers.util')
 
 local notify = helpers.notify
 
@@ -154,6 +155,13 @@ function module.colorschemes(options)
   }
 
   machine:init()
+end
+
+function module.switch_to_buffer(n, options)
+  local bufs = make_buffers(buffers.options.extend(options))
+  if bufs[n] then
+    buffer_util.switch_buf(bufs[n])
+  end
 end
 
 return module

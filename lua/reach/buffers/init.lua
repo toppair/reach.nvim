@@ -4,6 +4,7 @@ local helpers = require('reach.helpers')
 local read = require('reach.buffers.read')
 local sort = require('reach.buffers.sort')
 local util = require('reach.util')
+local buffer_util = require('reach.buffers.util')
 
 local auto_handles = require('reach.buffers.constant').auto_handles
 
@@ -115,18 +116,6 @@ local function set_grayout(entries, matches)
   end, entries)
 end
 
-local function switch_buf(buffer)
-  local status = pcall(vim.api.nvim_command, f('buffer %s', buffer.bufnr))
-
-  if not status then
-    vim.api.nvim_command(f('view %s', buffer.name))
-  end
-end
-
-local function split_buf(buffer, command)
-  vim.api.nvim_command(f('%s %s', command, buffer.bufnr))
-end
-
 local function hide_current()
   local current = vim.api.nvim_get_current_buf()
 
@@ -183,7 +172,7 @@ module.machine = {
           })
 
           if match then
-            switch_buf(match.data)
+            buffer_util.switch_buf(match.data)
           end
 
           self:transition('CLOSED')
@@ -228,7 +217,7 @@ module.machine = {
 
             if unsaved then
               notify('Save your changes first\n', vim.log.levels.ERROR, true)
-              switch_buf(unsaved)
+              buffer_util.switch_buf(unsaved)
             else
               return self:transition('OPEN')
             end
@@ -296,7 +285,7 @@ module.machine = {
           })
 
           if match then
-            split_buf(match.data, split_commands[self.ctx.state.input])
+            buffer_util.split_buf(match.data, split_commands[self.ctx.state.input])
           end
 
           self:transition('CLOSED')
