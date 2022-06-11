@@ -86,7 +86,7 @@ function Display:_open(config, options)
     self.config.row = config.row
     self.config.col = config.col
 
-    self.win = open_win(self.bufnr, false, self.config)
+    self.win = open_win(self.bufnr, false, vim.tbl_extend('force', self.config, { noautocmd = true }))
 
     win_set_option(self.win, 'winhighlight', 'NormalFloat:Normal,FloatBorder:ReachBorder')
   end
