@@ -1,7 +1,6 @@
 local Tree = require('reach.tree')
 local util = require('reach.util')
 
-local auto_handles = require('reach.buffers.constant').auto_handles
 local deduped_path = require('reach.buffers.util').deduped_path
 
 local module = {}
@@ -13,10 +12,11 @@ function module.assign_bufnr_handles(buffers)
 end
 
 function module.assign_auto_handles(buffers, options)
+  local auto_handles = options.auto_handles
   local index = 1
 
   for _, buffer in pairs(buffers) do
-    while vim.tbl_contains(options.exclude_handles, auto_handles[index]) do
+    while vim.tbl_contains(options.auto_exclude_handles, auto_handles[index]) do
       index = index + 1
     end
 

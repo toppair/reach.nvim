@@ -16,6 +16,7 @@ local default = {
   handle = 'auto',
   terminal_char = '\\',
   grayout = true,
+  auto_handles = require('reach.buffers.constant').auto_handles,
   auto_exclude_handles = {},
   previous = {
     enable = true,
@@ -35,6 +36,7 @@ local function validate(options)
     local terminal_char = options.terminal_char
     local previous = options.previous
     local handle = options.handle
+    local auto_handles = options.auto_handles
     local auto_exclude_handles = options.auto_exclude_handles
 
     vim.validate({
@@ -49,6 +51,7 @@ local function validate(options)
       handle = { handle, 'string', true },
       terminal_char = { terminal_char, 'string', true },
       grayout = { options.grayout, 'boolean', true },
+      auto_handles = { auto_handles, 'table', true },
       auto_exclude_handles = { auto_exclude_handles, 'table', true },
       previous = { previous, 'table', true },
     })
@@ -73,6 +76,24 @@ local function validate(options)
             return type(value) == 'string' and strdisplaywidth(value) == 1
           end,
           'one column width character',
+        },
+      })
+    end
+
+    if auto_handles then
+      vim.validate({
+        auto_handles = {
+          auto_handles,
+          function(value)
+            if #value == 0 then
+              return false
+            end
+
+            return util.every(function(item)
+              return type(item) == 'string' and strdisplaywidth(item) == 1
+            end, value)
+          end,
+          'list of one column width characters',
         },
       })
     end

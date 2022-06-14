@@ -338,12 +338,16 @@ module.machine = {
 
             cache.set('auto_priority', priorities)
 
-            buffers = sort.sort_priority(buffers, { sort = self.ctx.options.sort })
+            buffers = sort.sort_priority(buffers, { sort = options.sort })
 
-            assign_auto_handles(buffers, { exclude_handles = self.ctx.options.auto_exclude_handles })
+            assign_auto_handles(
+              buffers,
+              { auto_handles = options.auto_handles, auto_exclude_handles = options.auto_exclude_handles }
+            )
 
             table.sort(picker.entries, function(a, b)
-              return util.index_of(a.data.handle, auto_handles) < util.index_of(b.data.handle, auto_handles)
+              return util.index_of(a.data.handle, options.auto_handles)
+                < util.index_of(b.data.handle, options.auto_handles)
             end)
 
             picker:render()

@@ -89,7 +89,10 @@ return function(options)
 
   if options.handle == 'auto' then
     buffers = sort.sort_priority(buffers, { sort = options.sort })
-    handles.assign_auto_handles(buffers, { exclude_handles = options.auto_exclude_handles })
+    handles.assign_auto_handles(
+      buffers,
+      { auto_handles = options.auto_handles, auto_exclude_handles = options.auto_exclude_handles }
+    )
   else
     if type(options.sort) == 'function' then
       table.sort(buffers, function(b1, b2)
