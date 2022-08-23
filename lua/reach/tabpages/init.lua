@@ -43,8 +43,10 @@ function module.component(state)
 end
 
 local function read(entries, input)
+  input = input or util.pgetcharstr()
+
   if not input then
-    input = vim.fn.getcharstr()
+    return
   end
 
   return util.find(function(entry)
@@ -126,8 +128,14 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
+          local input = util.pgetcharstr()
+
+          if not input then
+            return self:transition('CLOSED')
+          end
+
           self.ctx.state = {
-            input = vim.fn.getcharstr(),
+            input = input,
           }
 
           self:transition(target_state(self.ctx.state.input))
@@ -168,7 +176,11 @@ module.machine = {
           local match
 
           repeat
-            local input = vim.fn.getcharstr()
+            local input = util.pgetcharstr()
+
+            if not input then
+              return self:transition('CLOSED')
+            end
 
             if input == ' ' then
               return self:transition('OPEN')

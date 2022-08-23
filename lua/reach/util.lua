@@ -106,4 +106,11 @@ function module.reverse(t)
   return output
 end
 
+function module.pgetcharstr()
+  local status, char = pcall(vim.fn.getcharstr)
+  if status then
+    return char:sub(-1)
+  end
+end
+
 return module

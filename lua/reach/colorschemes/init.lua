@@ -37,7 +37,11 @@ module.machine = {
           local match
 
           repeat
-            local input = vim.fn.getcharstr():sub(-1)
+            local input = util.pgetcharstr()
+
+            if not input then
+              return self:transition('CLOSED')
+            end
 
             match = util.find(function(entry)
               return entry.data.handle == input

@@ -142,8 +142,14 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
+          local input = util.pgetcharstr()
+
+          if not input then
+            return self:transition('CLOSED')
+          end
+
           self.ctx.state = {
-            input = vim.fn.getcharstr():sub(-1),
+            input = input,
           }
 
           self:transition(target_state(self.ctx.state.input))
@@ -225,7 +231,11 @@ module.machine = {
             local match
 
             repeat
-              local input = vim.fn.getcharstr()
+              local input = util.pgetcharstr()
+
+              if not input then
+                return self:transition('CLOSED')
+              end
 
               if input == ' ' and #picker.entries > 1 then
                 return self:transition('OPEN')
@@ -324,7 +334,11 @@ module.machine = {
             match.data.priority = nil
             picker:render()
 
-            local input = vim.fn.getcharstr()
+            local input = util.pgetcharstr()
+
+            if not input then
+              return self:transition('CLOSED')
+            end
 
             match:set_state({ exact = false })
 

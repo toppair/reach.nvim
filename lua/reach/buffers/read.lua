@@ -17,7 +17,11 @@ end
 function module.read_one(entries, options)
   options = options or {}
 
-  local input = options.input or vim.fn.getcharstr()
+  local input = options.input or util.pgetcharstr()
+
+  if not input then
+    return
+  end
 
   while true do
     entries = match_partial(entries, input)
@@ -36,7 +40,11 @@ function module.read_one(entries, options)
       options.on_input(entries, exact, input)
     end
 
-    local char = vim.fn.getcharstr()
+    local char = util.pgetcharstr()
+
+    if not char then
+      return
+    end
 
     if char:byte() == 13 then
       return exact
@@ -49,11 +57,11 @@ end
 function module.read_many(entries)
   local input
 
-  vim.ui.input({ prompt = 'bufnr: ' }, function(value)
+  local status = pcall(vim.ui.input, { prompt = 'bufnr: ' }, function(value)
     input = value
   end)
 
-  if not input then
+  if not status or not input then
     return nil
   end
 
