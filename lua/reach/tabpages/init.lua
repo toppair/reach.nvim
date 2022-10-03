@@ -158,7 +158,7 @@ module.machine = {
           self:transition('CLOSED')
         end,
       },
-      targets = { 'CLOSED', 'DELETING', 'SPLITTING' },
+      targets = { 'CLOSED', 'DELETING' },
     },
     DELETING = {
       hooks = {
