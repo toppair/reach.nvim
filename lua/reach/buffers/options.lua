@@ -26,18 +26,40 @@ local default = {
   },
 }
 
+local function optional(predicate)
+  return function(value)
+    if not value then
+      return true
+    end
+    return predicate(value)
+  end
+end
+
+local function one_of(values)
+  return function(value)
+    return type(values) == 'table' and vim.tbl_contains(values, value), 'one of: ' .. table.concat(values, ', ')
+  end
+end
+
+local function width(w)
+  return function(value)
+    return type(value) == 'string' and strdisplaywidth(value) == w, w .. ' column width string'
+  end
+end
+
+local function every(predicate)
+  return function(value)
+    return type(value) == 'table' and util.every(predicate, value)
+  end
+end
+
 local function validate(options)
   vim.validate({
     options = { options, 'table', true },
   })
 
   if options then
-    local force_delete = options.force_delete
-    local terminal_char = options.terminal_char
     local previous = options.previous
-    local handle = options.handle
-    local auto_handles = options.auto_handles
-    local auto_exclude_handles = options.auto_exclude_handles
 
     vim.validate({
       show_icons = { options.show_icons, 'boolean', true },
@@ -45,125 +67,34 @@ local function validate(options)
       show_modified = { options.show_modified, 'boolean', true },
       modified_icon = { options.modified_icon, 'string', true },
       grayout_current = { options.grayout_current, 'boolean', true },
-      force_delete = { force_delete, 'table', true },
+      force_delete = { options.force_delete, 'table', true },
       filter = { options.filter, 'function', true },
       sort = { options.sort, 'function', true },
-      handle = { handle, 'string', true },
-      terminal_char = { terminal_char, 'string', true },
+      handle = { options.handle, optional(one_of({ 'auto', 'dynamic', 'bufnr' })), 'auto, dynamic or bufnr' },
+      terminal_char = { options.terminal_char, optional(width(1)), 'one column width character' },
       grayout = { options.grayout, 'boolean', true },
-      auto_handles = { auto_handles, 'table', true },
-      auto_exclude_handles = { auto_exclude_handles, 'table', true },
+      auto_handles = { options.auto_handles, optional(every(width(1))), 'list of one column width characters' },
+      auto_exclude_handles = {
+        options.auto_exclude_handles,
+        optional(every(width(1))),
+        'list of one column width characters',
+      },
       previous = { previous, 'table', true },
     })
 
-    if handle then
-      vim.validate({
-        handle = {
-          handle,
-          function(value)
-            return vim.tbl_contains({ 'auto', 'dynamic', 'bufnr' }, value)
-          end,
-          '"auto" or "dynamic" or "bufnr"',
-        },
-      })
-    end
-
-    if terminal_char then
-      vim.validate({
-        terminal_char = {
-          terminal_char,
-          function(value)
-            return type(value) == 'string' and strdisplaywidth(value) == 1
-          end,
-          'one column width character',
-        },
-      })
-    end
-
-    if auto_handles then
-      vim.validate({
-        auto_handles = {
-          auto_handles,
-          function(value)
-            if #value == 0 then
-              return false
-            end
-
-            return util.every(function(item)
-              return type(item) == 'string' and strdisplaywidth(item) == 1
-            end, value)
-          end,
-          'list of one column width characters',
-        },
-      })
-    end
-
-    if auto_exclude_handles then
-      vim.validate({
-        auto_exclude_handles = {
-          auto_exclude_handles,
-          function(value)
-            return util.every(function(v)
-              return type(v) == 'string' and strdisplaywidth(v) == 1
-            end, value)
-          end,
-          'list of characters not to use as handles',
-        },
-      })
-    end
-
-    if force_delete then
-      vim.validate({
-        force_delete = {
-          force_delete,
-          function(value)
-            return util.every(function(v)
-              return type(v) == 'string'
-            end, value)
-          end,
-          'list of strings',
-        },
-      })
-    end
-
     if previous then
-      local chars = previous.chars
-      local groups = previous.groups
-
       vim.validate({
         enable = { previous.enable, 'boolean', true },
         depth = { previous.depth, 'number', true },
-        chars = { chars, 'table', true },
-        groups = { groups, 'table', true },
+        chars = { previous.chars, optional(every(width(1))), 'list of one column width characters' },
+        groups = {
+          previous.groups,
+          optional(every(function(value)
+            return type(value) == 'string'
+          end)),
+          'list of highlight groups',
+        },
       })
-
-      if chars then
-        vim.validate({
-          chars = {
-            chars,
-            function(value)
-              return util.every(function(v)
-                return type(v) == 'string' and strdisplaywidth(v) == 1
-              end, value)
-            end,
-            'list of one column width characters',
-          },
-        })
-      end
-
-      if groups then
-        vim.validate({
-          groups = {
-            chars,
-            function(value)
-              return util.every(function(v)
-                return type(v) == 'string'
-              end, value)
-            end,
-            'list of highlight groups',
-          },
-        })
-      end
     end
   end
 end
