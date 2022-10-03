@@ -117,15 +117,12 @@ end
 function module.pgetcharstr()
   local status, char = pcall(vim.fn.getcharstr)
   if status then
-    return char:sub(-1)
+    return char
   end
 end
 
-function module.pgetkey()
-  local char = module.pgetcharstr()
-  if char then
-    return vim.fn.keytrans(char)
-  end
+function module.replace_termcodes(input)
+  return vim.api.nvim_replace_termcodes(input, true, true, true)
 end
 
 return module

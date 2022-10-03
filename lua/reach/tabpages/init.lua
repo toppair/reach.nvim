@@ -55,7 +55,7 @@ local function read(entries, input)
 end
 
 local function target_state(input, actions)
-  if input == actions.delete then
+  if input == util.replace_termcodes(actions.delete) then
     return 'DELETING'
   end
 
@@ -128,7 +128,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
-          local input = util.pgetkey()
+          local input = util.pgetcharstr()
 
           if not input then
             return self:transition('CLOSED')
@@ -182,7 +182,7 @@ module.machine = {
               return self:transition('CLOSED')
             end
 
-            if input == self.ctx.options.actions.delete then
+            if input == util.replace_termcodes(self.ctx.options.actions.delete) then
               return self:transition('OPEN')
             end
 

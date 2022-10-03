@@ -50,11 +50,13 @@ local function read(entries, input)
 end
 
 local function target_state(input, actions)
-  if input == actions.delete then
+  local r = util.replace_termcodes
+
+  if input == r(actions.delete) then
     return 'DELETING'
   end
 
-  if vim.tbl_contains({ actions.split, actions.vertsplit, actions.tabsplit }, input) then
+  if vim.tbl_contains({ r(actions.split), r(actions.vertsplit), r(actions.tabsplit) }, input) then
     return 'SPLITTING'
   end
 
@@ -79,7 +81,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render()
 
-          local input = util.pgetkey()
+          local input = util.pgetcharstr()
 
           if not input then
             return self:transition('CLOSED')
@@ -122,13 +124,13 @@ module.machine = {
           local match
 
           repeat
-            local input = util.pgetkey()
+            local input = util.pgetcharstr()
 
             if not input then
               return self:transition('CLOSED')
             end
 
-            if input == self.ctx.options.actions.delete then
+            if input == util.replace_termcodes(self.ctx.options.actions.delete) then
               return self:transition('OPEN')
             end
 
@@ -171,7 +173,9 @@ module.machine = {
               tabsplit = { 'tab sbuffer', 'tabnew' },
             }
 
-            local action = util.find_key(self.ctx.state.input, self.ctx.options.actions)
+            local action = util.find_key(function(value)
+              return self.ctx.state.input == util.replace_termcodes(value)
+            end, self.ctx.options.actions)
             local split_command = action_to_command[action]
 
             if match.data.global then

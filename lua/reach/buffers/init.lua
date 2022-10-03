@@ -85,15 +85,17 @@ function module.component(state)
 end
 
 local function target_state(input, actions)
-  if input == actions.delete then
+  local r = util.replace_termcodes
+
+  if input == r(actions.delete) then
     return 'DELETING'
   end
 
-  if vim.tbl_contains({ actions.split, actions.vertsplit, actions.tabsplit }, input) then
+  if vim.tbl_contains({ r(actions.split), r(actions.vertsplit), r(actions.tabsplit) }, input) then
     return 'SPLITTING'
   end
 
-  if input == actions.priority then
+  if input == r(actions.priority) then
     return 'SETTING_PRIORITY'
   end
 
@@ -136,7 +138,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
-          local input = util.pgetkey()
+          local input = util.pgetcharstr()
 
           if not input then
             return self:transition('CLOSED')
@@ -225,13 +227,13 @@ module.machine = {
             local match
 
             repeat
-              local input = util.pgetkey()
+              local input = util.pgetcharstr()
 
               if not input then
                 return self:transition('CLOSED')
               end
 
-              if input == self.ctx.options.actions.delete and #picker.entries > 1 then
+              if input == util.replace_termcodes(self.ctx.options.actions.delete) and #picker.entries > 1 then
                 return self:transition('OPEN')
               end
 
@@ -295,7 +297,9 @@ module.machine = {
               tabsplit = 'tab sbuffer',
             }
 
-            local action = util.find_key(self.ctx.state.input, self.ctx.options.actions)
+            local action = util.find_key(function(value)
+              return self.ctx.state.input == util.replace_termcodes(value)
+            end, self.ctx.options.actions)
 
             buffer_util.split_buf(match.data, action_to_command[action])
           end
