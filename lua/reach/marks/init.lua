@@ -49,18 +49,12 @@ local function read(entries, input)
   end, entries)
 end
 
-local split_commands = {
-  ['|'] = { 'vertical sbuffer', 'vertical split' },
-  ['-'] = { 'sbuffer', 'split' },
-  [']'] = { 'tab sbuffer', 'tabnew' },
-}
-
-local function target_state(input)
-  if input == ' ' then
+local function target_state(input, actions)
+  if input == actions.delete then
     return 'DELETING'
   end
 
-  if vim.tbl_contains(vim.tbl_keys(split_commands), input) then
+  if vim.tbl_contains({ actions.split, actions.vertsplit, actions.tabsplit }, input) then
     return 'SPLITTING'
   end
 
@@ -85,7 +79,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render()
 
-          local input = util.pgetcharstr()
+          local input = util.pgetkey()
 
           if not input then
             return self:transition('CLOSED')
@@ -95,7 +89,7 @@ module.machine = {
             input = input,
           }
 
-          self:transition(target_state(self.ctx.state.input))
+          self:transition(target_state(self.ctx.state.input, self.ctx.options.actions))
         end,
       },
       targets = { 'SWITCHING', 'DELETING', 'SPLITTING', 'CLOSED' },
@@ -128,13 +122,13 @@ module.machine = {
           local match
 
           repeat
-            local input = util.pgetcharstr()
+            local input = util.pgetkey()
 
             if not input then
               return self:transition('CLOSED')
             end
 
-            if input == ' ' then
+            if input == self.ctx.options.actions.delete then
               return self:transition('OPEN')
             end
 
@@ -171,7 +165,14 @@ module.machine = {
           local match = read(picker.entries)
 
           if match then
-            local split_command = split_commands[self.ctx.state.input]
+            local action_to_command = {
+              split = { 'sbuffer', 'split' },
+              vertsplit = { 'vertical sbuffer', 'vertical split' },
+              tabsplit = { 'tab sbuffer', 'tabnew' },
+            }
+
+            local action = util.find_key(self.ctx.state.input, self.ctx.options.actions)
+            local split_command = action_to_command[action]
 
             if match.data.global then
               local row, _, _, name = unpack(vim.api.nvim_get_mark(match.data.mark, {}))

@@ -57,6 +57,14 @@ local options = {
       'Comment'
     },
   },
+  -- A map of action to key that should be used to invoke it
+  actions = {
+    split = '-',
+    vertsplit = '|',
+    tabsplit = ']',
+    delete = '<Space>',
+    priority = '=',
+  },
 }
 
 require('reach').buffers(options)
@@ -88,6 +96,13 @@ local options = {
   filter = function(mark)
     return mark:match('[a-zA-Z]') -- return true to disable
   end,
+  -- A map of action to key that should be used to invoke it
+  actions = {
+    split = '-',
+    vertsplit = '|',
+    tabsplit = ']',
+    delete = '<Space>',
+  },
 }
 
 require('reach').marks(options)
@@ -113,6 +128,10 @@ When window is open:
 local options = {
   show_icons = true,
   show_current = false,
+  -- A map of action to key that should be used to invoke it
+  actions = {
+    delete = '<Space>',
+  },
 }
 
 require('reach').tabpages(options)

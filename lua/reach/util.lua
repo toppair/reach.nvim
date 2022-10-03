@@ -74,6 +74,14 @@ function module.index_of(val, t)
   end
 end
 
+function module.find_key(val, t)
+  for key, value in pairs(t) do
+    if (type(val) == 'function' and val(value)) or val == value then
+      return key
+    end
+  end
+end
+
 function module.max(fn, t)
   local max = { nil, 0 }
 
@@ -110,6 +118,13 @@ function module.pgetcharstr()
   local status, char = pcall(vim.fn.getcharstr)
   if status then
     return char:sub(-1)
+  end
+end
+
+function module.pgetkey()
+  local char = module.pgetcharstr()
+  if char then
+    return vim.fn.keytrans(char)
   end
 end
 

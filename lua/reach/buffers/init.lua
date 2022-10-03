@@ -84,22 +84,16 @@ function module.component(state)
   return parts
 end
 
-local split_commands = {
-  ['|'] = 'vertical sbuffer',
-  ['-'] = 'sbuffer',
-  [']'] = 'tab sbuffer',
-}
-
-local function target_state(input)
-  if input == ' ' then
+local function target_state(input, actions)
+  if input == actions.delete then
     return 'DELETING'
   end
 
-  if vim.tbl_contains(vim.tbl_keys(split_commands), input) then
+  if vim.tbl_contains({ actions.split, actions.vertsplit, actions.tabsplit }, input) then
     return 'SPLITTING'
   end
 
-  if input == '=' then
+  if input == actions.priority then
     return 'SETTING_PRIORITY'
   end
 
@@ -142,7 +136,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
-          local input = util.pgetcharstr()
+          local input = util.pgetkey()
 
           if not input then
             return self:transition('CLOSED')
@@ -152,7 +146,7 @@ module.machine = {
             input = input,
           }
 
-          self:transition(target_state(self.ctx.state.input))
+          self:transition(target_state(self.ctx.state.input, self.ctx.options.actions))
         end,
       },
       targets = { 'SWITCHING', 'DELETING', 'SPLITTING', 'SETTING_PRIORITY', 'CLOSED' },
@@ -231,13 +225,13 @@ module.machine = {
             local match
 
             repeat
-              local input = util.pgetcharstr()
+              local input = util.pgetkey()
 
               if not input then
                 return self:transition('CLOSED')
               end
 
-              if input == ' ' and #picker.entries > 1 then
+              if input == self.ctx.options.actions.delete and #picker.entries > 1 then
                 return self:transition('OPEN')
               end
 
@@ -295,7 +289,15 @@ module.machine = {
           })
 
           if match then
-            buffer_util.split_buf(match.data, split_commands[self.ctx.state.input])
+            local action_to_command = {
+              split = 'sbuffer',
+              vertsplit = 'vertical sbuffer',
+              tabsplit = 'tab sbuffer',
+            }
+
+            local action = util.find_key(self.ctx.state.input, self.ctx.options.actions)
+
+            buffer_util.split_buf(match.data, action_to_command[action])
           end
 
           self:transition('CLOSED')

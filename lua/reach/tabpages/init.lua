@@ -54,8 +54,8 @@ local function read(entries, input)
   end, entries)
 end
 
-local function target_state(input)
-  if input == ' ' then
+local function target_state(input, actions)
+  if input == actions.delete then
     return 'DELETING'
   end
 
@@ -128,7 +128,7 @@ module.machine = {
           picker:set_ctx({ state = self.current })
           picker:render(not self.ctx.options.show_current and hide_current() or nil)
 
-          local input = util.pgetcharstr()
+          local input = util.pgetkey()
 
           if not input then
             return self:transition('CLOSED')
@@ -138,7 +138,7 @@ module.machine = {
             input = input,
           }
 
-          self:transition(target_state(self.ctx.state.input))
+          self:transition(target_state(self.ctx.state.input, self.ctx.options.actions))
         end,
       },
       targets = { 'SWITCHING', 'DELETING', 'CLOSED' },
@@ -182,7 +182,7 @@ module.machine = {
               return self:transition('CLOSED')
             end
 
-            if input == ' ' then
+            if input == self.ctx.options.actions.delete then
               return self:transition('OPEN')
             end
 

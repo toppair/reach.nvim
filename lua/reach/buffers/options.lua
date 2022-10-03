@@ -24,6 +24,13 @@ local default = {
     chars = { '•' },
     groups = { 'String', 'Comment' },
   },
+  actions = {
+    split = '-',
+    vertsplit = '|',
+    tabsplit = ']',
+    delete = '<Space>',
+    priority = '=',
+  },
 }
 
 local function optional(predicate)
@@ -60,6 +67,7 @@ local function validate(options)
 
   if options then
     local previous = options.previous
+    local actions = options.actions
 
     vim.validate({
       show_icons = { options.show_icons, 'boolean', true },
@@ -80,6 +88,7 @@ local function validate(options)
         'list of one column width characters',
       },
       previous = { previous, 'table', true },
+      actions = { actions, 'table', true },
     })
 
     if previous then
@@ -94,6 +103,16 @@ local function validate(options)
           end)),
           'list of highlight groups',
         },
+      })
+    end
+
+    if actions then
+      vim.validate({
+        split = { actions.split, 'string', true },
+        vertsplit = { actions.vertsplit, 'string', true },
+        tabsplit = { actions.tabsplit, 'string', true },
+        delete = { actions.delete, 'string', true },
+        priority = { actions.priority, 'string', true },
       })
     end
   end

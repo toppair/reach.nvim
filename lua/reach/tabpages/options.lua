@@ -3,6 +3,9 @@ local module = {}
 local default = {
   show_icons = true,
   show_current = false,
+  actions = {
+    delete = '<Space>',
+  },
 }
 
 local function validate(options)
@@ -11,10 +14,18 @@ local function validate(options)
   })
 
   if options then
+    local actions = options.actions
+
     vim.validate({
       show_icons = { options.show_icons, 'boolean', true },
       show_current = { options.show_current, 'boolean', true },
     })
+
+    if actions then
+      vim.validate({
+        delete = { actions.delete, 'string', true },
+      })
+    end
   end
 end
 
