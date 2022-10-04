@@ -14,7 +14,7 @@ buffer / mark / tabpage / colorscheme switcher for [Neovim](https://github.com/n
 use 'toppair/reach.nvim'
 ```
 
-### Usage
+### Setup
 
 ```lua
 -- default config
@@ -23,17 +23,19 @@ require('reach').setup({
 })
 ```
 
+### Usage
+
 #### buffers
 
 ```lua
 -- default
 local options = {
-  handle = 'auto'               -- 'bufnr' or 'dynamic' or 'auto'
+  handle = 'auto',              -- 'bufnr' or 'dynamic' or 'auto'
   show_icons = true,
   show_current = false,         -- Include current buffer in the list
   show_modified = true,         -- Show buffer modified indicator
-  modified_icon = '⬤'           -- Character to use as modified indicator
-  grayout_current = true        -- Wheter to gray out current buffer entry
+  modified_icon = '⬤',          -- Character to use as modified indicator
+  grayout_current = true,       -- Wheter to gray out current buffer entry
   force_delete = {},            -- List of filetypes / buftypes to use
                                 -- 'bdelete!' on, e.g. { 'terminal' }
   filter = nil,                 -- Function taking bufnr as parameter,
@@ -53,8 +55,8 @@ local options = {
     chars = { '•' },            -- Characters to use as markers,
                                 -- last one is used when depth > #chars
     groups = {                  -- Highlight groups for markers,
-      'String'                  -- last one is used when depth > #groups
-      'Comment'
+      'String',                 -- last one is used when depth > #groups
+      'Comment',
     },
   },
   -- A map of action to key that should be used to invoke it
@@ -186,20 +188,20 @@ require('reach').switch_to_buffer(n, options)
 ### Highlights
 
 ```
-ReachBorder             -> 'Comment',
-ReachDirectory          -> 'Directory',
-ReachModifiedIndicator  -> 'String',
-ReachHandleBuffer       -> 'String',
-ReachHandleDelete       -> 'Error',
-ReachHandleSplit        -> 'Directory',
-ReachTail               -> 'Normal',
-ReachHandleMarkLocal    -> 'Type',
-ReachHandleMarkGlobal   -> 'Number',
-ReachMark               -> 'Normal',
-ReachMarkLocation       -> 'Comment',
-ReachHandleTabpage      -> 'TabLineSel',
-ReachGrayOut            -> 'Comment',
-ReachMatchExact         -> 'String',
-ReachPriority           -> 'Special',
+ReachBorder             -> 'Comment'
+ReachDirectory          -> 'Directory'
+ReachModifiedIndicator  -> 'String'
+ReachHandleBuffer       -> 'String'
+ReachHandleDelete       -> 'Error'
+ReachHandleSplit        -> 'Directory'
+ReachTail               -> 'Normal'
+ReachHandleMarkLocal    -> 'Type'
+ReachHandleMarkGlobal   -> 'Number'
+ReachMark               -> 'Normal'
+ReachMarkLocation       -> 'Comment'
+ReachHandleTabpage      -> 'TabLineSel'
+ReachGrayOut            -> 'Comment'
+ReachMatchExact         -> 'String'
+ReachPriority           -> 'Special'
 ReachCurrent            -> 'Title'
 ```
