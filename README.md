@@ -10,8 +10,14 @@ buffer / mark / tabpage / colorscheme switcher for [Neovim](https://github.com/n
 
 ### Installation
 
+Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 ```lua
 use 'toppair/reach.nvim'
+```
+
+Using [vim-plug](https://github.com/junegunn/vim-plug)
+```vim
+Plug 'toppair/reach.nvim'
 ```
 
 ### Setup
@@ -70,6 +76,9 @@ local options = {
 }
 
 require('reach').buffers(options)
+
+-- Example keymapping
+vim.keymap.set('n', '<leader>rb', function() require('reach').buffers(buffer_options) end, {})
 ```
 
 or command with default options applied:
